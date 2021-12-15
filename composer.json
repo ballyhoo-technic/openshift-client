@@ -1,6 +1,6 @@
 {
-    "name": "universityofadelaide/openshift-client",
-    "description": "Simple OpenShift client for PHP.",
+    "name": "ballyhoo-techic/openshift-client",
+    "description": "Simple OpenShift client for PHP. Fork of: https://github.com/universityofadelaide/openshift-client",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -11,6 +11,10 @@
         {
             "name": "Casey Fulton",
             "email": "casey.fulton@adelaide.edu.au"
+        },
+        {
+            "name": "Rene Mertins",
+            "email": "r.mertins@ballyhoo.de"
         }
     ],
     "require": {
