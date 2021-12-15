@@ -1,6 +1,6 @@
 {
-    "name": "universityofadelaide/openshift-client",
-    "description": "Simple OpenShift client for PHP.",
+    "name": "ballyhoo-techic/openshift-client",
+    "description": "Simple OpenShift client for PHP. Fork of: https://github.com/universityofadelaide/openshift-client",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -11,10 +11,15 @@
         {
             "name": "Casey Fulton",
             "email": "casey.fulton@adelaide.edu.au"
+        },
+        {
+            "name": "Rene Mertins",
+            "email": "r.mertins@ballyhoo.de"
         }
     ],
     "require": {
-        "guzzlehttp/guzzle" : "^6.2.1"
+        "guzzlehttp/guzzle" : "^6.2.1",
+        "symfony/serializer": "~3.4.0"
     },
     "require-dev": {
         "phpunit/phpunit" : "~4.0",
@@ -25,5 +30,10 @@
         "psr-4": {
             "UniversityOfAdelaide\\OpenShift\\": "src/"
         }
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "UniversityOfAdelaide\\OpenShift\\Tests\\": "tests/src"
+      }
     }
 }

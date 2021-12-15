@@ -4,6 +4,20 @@ namespace UniversityOfAdelaide\OpenShift;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\RequestException;
+use UniversityOfAdelaide\OpenShift\Objects\Backups\Backup;
+use UniversityOfAdelaide\OpenShift\Objects\Backups\BackupList;
+use UniversityOfAdelaide\OpenShift\Objects\Backups\Restore;
+use UniversityOfAdelaide\OpenShift\Objects\Backups\RestoreList;
+use UniversityOfAdelaide\OpenShift\Objects\Backups\ScheduledBackup;
+use UniversityOfAdelaide\OpenShift\Objects\Backups\Sync;
+use UniversityOfAdelaide\OpenShift\Objects\Backups\SyncList;
+use UniversityOfAdelaide\OpenShift\Objects\ConfigMap;
+use UniversityOfAdelaide\OpenShift\Objects\Hpa;
+use UniversityOfAdelaide\OpenShift\Objects\Route;
+use UniversityOfAdelaide\OpenShift\Objects\Label;
+use UniversityOfAdelaide\OpenShift\Objects\NetworkPolicy;
+use UniversityOfAdelaide\OpenShift\Objects\StatefulSet;
+use UniversityOfAdelaide\OpenShift\Serializer\OpenShiftSerializerFactory;
 
 /**
  * Class Client.
@@ -44,11 +58,41 @@ class Client implements ClientInterface {
   protected $guzzleClient;
 
   /**
+   * The serializer.
+   *
+   * @var \Symfony\Component\Serializer\Serializer
+   */
+  protected $serializer;
+
+  /**
    * Resource map.
    *
    * @var array
    */
   protected $resourceMap = [
+    'backup' => [
+      'create' => [
+        'action' => 'POST',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/backups',
+      ],
+      'delete' => [
+        'action' => 'DELETE',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/backups/{name}',
+      ],
+      'get'    => [
+        'action' => 'GET',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/backups/{name}',
+      ],
+      'update' => [
+        // We use PATCH here since we're using nicely serialized data.
+        'action' => 'PATCH',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/backups/{name}',
+      ],
+      'list' => [
+        'action' => 'GET',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/backups',
+      ],
+    ],
     'buildconfig' => [
       'create' => [
         'action' => 'POST',
@@ -71,6 +115,16 @@ class Client implements ClientInterface {
       'get' => [
         'action' => 'GET',
         'uri'    => '/oapi/v1/namespaces/{namespace}/builds/{name}',
+      ],
+    ],
+    'configmap' => [
+      'get' => [
+        'action' => 'GET',
+        'uri'    => '/api/v1/namespaces/{namespace}/configmaps/{name}',
+      ],
+      'update' => [
+        'action' => 'PUT',
+        'uri'    => '/api/v1/namespaces/{namespace}/configmaps/{name}',
       ],
     ],
     'cronjob' => [
@@ -119,6 +173,24 @@ class Client implements ClientInterface {
         'uri'    => '/oapi/v1/namespaces/{namespace}/deploymentconfigs',
       ],
     ],
+    'hpa' => [
+      'create' => [
+        'action' => 'POST',
+        'uri'    => '/apis/autoscaling/v1/namespaces/{namespace}/horizontalpodautoscalers',
+      ],
+      'delete' => [
+        'action' => 'DELETE',
+        'uri'    => '/apis/autoscaling/v1/namespaces/{namespace}/horizontalpodautoscalers/{name}',
+      ],
+      'get' => [
+        'action' => 'GET',
+        'uri'    => '/apis/autoscaling/v1/namespaces/{namespace}/horizontalpodautoscalers/{name}',
+      ],
+      'update' => [
+        'action' => 'PUT',
+        'uri'    => '/apis/autoscaling/v1/namespaces/{namespace}/horizontalpodautoscalers/{name}',
+      ],
+    ],
     'imagestream' => [
       'create' => [
         'action' => 'POST',
@@ -159,6 +231,20 @@ class Client implements ClientInterface {
       'update' => [
         'action' => 'PUT',
         'uri'    => '/apis/batch/v1/namespaces/{namespace}/jobs/{name}',
+      ],
+    ],
+    'networkpolicy' => [
+      'get' => [
+        'action' => 'GET',
+        'uri'    => '/apis/extensions/v1beta1/namespaces/{namespace}/networkpolicies/{name}',
+      ],
+      'create' => [
+        'action' => 'POST',
+        'uri'    => '/apis/extensions/v1beta1/namespaces/{namespace}/networkpolicies',
+      ],
+      'delete' => [
+        'action' => 'DELETE',
+        'uri'    => '/apis/extensions/v1beta1/namespaces/{namespace}/networkpolicies/{name}',
       ],
     ],
     'persistentvolumeclaim' => [
@@ -209,6 +295,24 @@ class Client implements ClientInterface {
         'uri'    => '/api/v1/namespaces/{namespace}/replicationcontrollers/{name}',
       ],
     ],
+    'restore' => [
+      'create' => [
+        'action' => 'POST',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/restores',
+      ],
+      'delete' => [
+        'action' => 'DELETE',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/restores/{name}',
+      ],
+      'get'    => [
+        'action' => 'GET',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/restores/{name}',
+      ],
+      'list' => [
+        'action' => 'GET',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/restores',
+      ],
+    ],
     'route' => [
       'create' => [
         'action' => 'POST',
@@ -225,6 +329,25 @@ class Client implements ClientInterface {
       'update' => [
         'action' => 'PUT',
         'uri'    => '/oapi/v1/namespaces/{namespace}/routes/{name}',
+      ],
+    ],
+    'schedule' => [
+      'get' => [
+        'action' => 'GET',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/backupscheduleds/{name}',
+      ],
+      'create' => [
+        'action' => 'POST',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/backupscheduleds',
+      ],
+      'update' => [
+        // We use PATCH here since we're using nicely serialized data.
+        'action' => 'PATCH',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/backupscheduleds/{name}',
+      ],
+      'delete' => [
+        'action' => 'DELETE',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/backupscheduleds/{name}',
       ],
     ],
     'secret' => [
@@ -267,6 +390,30 @@ class Client implements ClientInterface {
         'uri'    => '/api/v1/namespaces/{namespace}/services/{name}',
       ],
     ],
+    'statefulset' => [
+      'get'         => [
+        'action' => 'GET',
+        'uri'    => '/apis/apps/v1/namespaces/{namespace}/statefulsets/{name}',
+      ],
+      'update'      => [
+        'action' => 'PUT',
+        'uri'    => '/apis/apps/v1/namespaces/{namespace}/statefulsets/{name}',
+      ],
+    ],
+    'sync' => [
+      'create' => [
+        'action' => 'POST',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/syncs',
+      ],
+      'get'    => [
+        'action' => 'GET',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/syncs/{name}',
+      ],
+      'list' => [
+        'action' => 'GET',
+        'uri'    => '/apis/extension.shepherd/v1/namespaces/{namespace}/syncs',
+      ],
+    ],
   ];
 
   /**
@@ -296,6 +443,7 @@ class Client implements ClientInterface {
         'Accept' => 'application/json',
       ],
     ]);
+    $this->serializer = OpenShiftSerializerFactory::create();
   }
 
   /**
@@ -345,27 +493,32 @@ class Client implements ClientInterface {
         }
         else {
           $array[$key] = $this->filterEmptyArrays($value);
+          // If the key itself is empty after filtering its values, remove it.
+          if (empty($array[$key])) {
+            unset($array[$key]);
+          }
         }
       }
     }
+
     return $array;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function request(string $method, string $uri, array $body = [], array $query = []) {
+  public function request(string $method, string $uri, $body = NULL, array $query = [], $decode_response = TRUE) {
     $requestOptions = [];
 
     // Openshift API borks on empty array parameters, remove them.
-    $body = $this->filterEmptyArrays($body);
-
-    if ($method !== 'DELETE') {
-      $requestOptions = [
-        'query' => $query,
-        'body' => json_encode($body),
-      ];
+    if (is_array($body)) {
+      $body = $this->filterEmptyArrays($body);
     }
+
+    $requestOptions = [
+      'query' => $query,
+      'body' => is_array($body) ? json_encode($body) : $body,
+    ];
 
     if ($method === 'PATCH') {
       $requestOptions['headers']['Content-Type'] = 'application/merge-patch+json';
@@ -393,7 +546,8 @@ class Client implements ClientInterface {
         $e->hasResponse() ? $e->getResponse()->getBody() : ''
       );
     }
-    return json_decode($response->getBody()->getContents(), TRUE);
+    $contents = $response->getBody()->getContents();
+    return $decode_response ? json_decode($contents, TRUE) : $contents;
   }
 
   /**
@@ -456,10 +610,12 @@ class Client implements ClientInterface {
 
     // @todo - this should use model.
     $secret = [
-      'api_version' => 'v1',
       'kind' => 'Secret',
       'metadata' => [
         'name' => $name,
+        'labels' => [
+          'app' => $name,
+        ],
       ],
       'type' => 'Opaque',
       'data' => $data,
@@ -490,10 +646,12 @@ class Client implements ClientInterface {
     }
 
     $secret = [
-      'api_version' => 'v1',
       'kind' => 'Secret',
       'metadata' => [
         'name' => $name,
+        'labels' => [
+          'app' => $name,
+        ],
       ],
       'type' => 'Opaque',
       'data' => $data,
@@ -519,9 +677,15 @@ class Client implements ClientInterface {
   /**
    * {@inheritdoc}
    */
-  public function createService(string $name, string $deployment_name, int $port, int $target_port, string $app_name) {
+  public function createService(string $name, string $deployment_name, int $port, int $target_port, string $app_name, array $selector = []) {
     $resourceMethod = $this->getResourceMethod(__METHOD__);
     $uri = $this->createRequestUri($resourceMethod['uri']);
+    // Default selector to deploymentconfig => deploymentname.
+    if (empty($selector)) {
+      $selector = [
+        'deploymentconfig' => $deployment_name,
+      ];
+    }
 
     // @todo - use a model.
     $service = [
@@ -540,9 +704,7 @@ class Client implements ClientInterface {
             'targetPort' => $target_port,
           ],
         ],
-        'selector' => [
-          'deploymentconfig' => $deployment_name,
-        ],
+        'selector' => $selector,
       ],
     ];
 
@@ -610,31 +772,8 @@ class Client implements ClientInterface {
   /**
    * {@inheritdoc}
    */
-  public function createRoute(string $name, string $service_name, string $domain, string $path = NULL, array $annotations = []) {
-    $resourceMethod = $this->getResourceMethod(__METHOD__);
-    $uri = $this->createRequestUri($resourceMethod['uri']);
-
-    $route = [
-      'kind' => 'Route',
-      'metadata' => [
-        'name' => $name,
-        'labels' => ['app' => $name],
-      ],
-      'spec' => [
-        'host' => $domain,
-        'path' => $path,
-        'to' => [
-          'kind' => 'Service',
-          'name' => $service_name,
-        ],
-      ],
-    ];
-
-    if (count($annotations)) {
-      $route['metadata']['annotations'] = $annotations;
-    }
-
-    return $this->request($resourceMethod['action'], $uri, $route);
+  public function createRoute(Route $route) {
+    return $this->createSerializableObject(__METHOD__, $route);
   }
 
   /**
@@ -936,6 +1075,7 @@ class Client implements ClientInterface {
       ],
       'spec' => [
         'replicas' => 1,
+        'revisionHistoryLimit' => 5,
         'selector' => array_key_exists('labels', $data) ? array_merge($data['labels'], ['name' => $name]) : [],
         'strategy' => [
           'rollingParams' => [
@@ -1152,6 +1292,13 @@ class Client implements ClientInterface {
    */
   public function updateDeploymentConfig(string $name, array $deployment_config, array $config) {
     $deployment_config = array_replace_recursive($deployment_config, $config);
+
+    // Just replace the entire env array as the replace screws it up.
+    if (isset($config['spec']['template']['spec']['containers'][0]['env'])) {
+      $deployment_config['spec']['template']['spec']['containers'][0]['env'] =
+        $config['spec']['template']['spec']['containers'][0]['env'];
+    }
+
     $resourceMethod = $this->getResourceMethod(__METHOD__);
     $uri = $this->createRequestUri($resourceMethod['uri'], [
       'name' => $name,
@@ -1404,6 +1551,268 @@ class Client implements ClientInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getBackup(string $name) {
+    $result = $this->apiCall(__METHOD__, $name, NULL, FALSE);
+    if (!$result) {
+      return FALSE;
+    }
+    return $this->serializer->deserialize($result, Backup::class, 'json');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function listBackup(Label $label_selector = NULL) {
+    $label = NULL;
+    if ($label_selector) {
+      $label = (string) $label_selector;
+    }
+
+    $result = $this->apiCall(__METHOD__, '', $label, FALSE);
+    if (!$result) {
+      return FALSE;
+    }
+    return $this->serializer->deserialize($result, BackupList::class, 'json');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createBackup(Backup $backup) {
+    return $this->createSerializableObject(__METHOD__, $backup);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function updateBackup(Backup $backup) {
+    return $this->createSerializableObject(__METHOD__, $backup, ['name' => $backup->getName()]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteBackup(string $name) {
+    return $this->apiCall(__METHOD__, $name);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createRestore(Restore $restore) {
+    return $this->createSerializableObject(__METHOD__, $restore);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function listRestore(Label $label_selector = NULL) {
+    $label = NULL;
+    if ($label_selector) {
+      $label = (string) $label_selector;
+    }
+
+    $result = $this->apiCall(__METHOD__, '', $label, FALSE);
+    if (!$result) {
+      return FALSE;
+    }
+    return $this->serializer->deserialize($result, RestoreList::class, 'json');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSchedule(string $name) {
+    $result = $this->apiCall(__METHOD__, $name, NULL, FALSE);
+    if (!$result) {
+      return FALSE;
+    }
+    return $this->serializer->deserialize($result, ScheduledBackup::class, 'json');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createSchedule(ScheduledBackup $schedule) {
+    return $this->createSerializableObject(__METHOD__, $schedule);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function updateSchedule(ScheduledBackup $schedule) {
+    return $this->createSerializableObject(__METHOD__, $schedule, ['name' => $schedule->getName()]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteSchedule(string $name, bool $cascade = FALSE) {
+    $resourceMethod = $this->getResourceMethod(__METHOD__);
+    $uri = $this->createRequestUri($resourceMethod['uri'], [
+      'name' => $name,
+    ]);
+    // @link https://kubernetes.io/docs/concepts/workloads/controllers/garbage-collection/
+    $body = $cascade ? NULL : '{"kind":"DeleteOptions","apiVersion":"v1","propagationPolicy":"Orphan"}';
+    return $this->request($resourceMethod['action'], $uri, $body);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function updateConfigmap(ConfigMap $configMap) {
+    return $this->createSerializableObject(__METHOD__, $configMap, ['name' => $configMap->getName()]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConfigmap(string $name) {
+    $result = $this->apiCall(__METHOD__, $name, NULL, FALSE);
+    if (!$result) {
+      return FALSE;
+    }
+    return $this->serializer->deserialize($result, ConfigMap::class, 'json');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getNetworkpolicy(string $name) {
+    $result = $this->apiCall(__METHOD__, $name, NULL, FALSE);
+    if (!$result) {
+      return FALSE;
+    }
+    return $this->serializer->deserialize($result, NetworkPolicy::class, 'json');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createNetworkpolicy(NetworkPolicy $np) {
+    return $this->createSerializableObject(__METHOD__, $np);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteNetworkpolicy(string $name) {
+    return $this->apiCall(__METHOD__, $name);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function updateStatefulset(StatefulSet $statefulSet) {
+    return $this->createSerializableObject(__METHOD__, $statefulSet, ['name' => $statefulSet->getName()]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getStatefulset(string $name) {
+    $result = $this->apiCall(__METHOD__, $name, NULL, FALSE);
+    if (!$result) {
+      return FALSE;
+    }
+    return $this->serializer->deserialize($result, StatefulSet::class, 'json');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createHpa(Hpa $hpa) {
+    return $this->createSerializableObject(__METHOD__, $hpa);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteHpa(string $name) {
+    return $this->apiCall(__METHOD__, $name);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getHpa(string $name) {
+    $result = $this->apiCall(__METHOD__, $name, NULL, FALSE);
+    if (!$result) {
+      return FALSE;
+    }
+    return $this->serializer->deserialize($result, Hpa::class, 'json');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function updateHpa(Hpa $hpa) {
+    return $this->createSerializableObject(__METHOD__, $hpa, ['name' => $hpa->getName()]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSync(string $name) {
+    $result = $this->apiCall(__METHOD__, $name, NULL, FALSE);
+    if (!$result) {
+      return FALSE;
+    }
+    return $this->serializer->deserialize($result, Sync::class, 'json');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function listSync(Label $label_selector = NULL) {
+    $label = NULL;
+    if ($label_selector) {
+      $label = (string) $label_selector;
+    }
+
+    $result = $this->apiCall(__METHOD__, '', $label, FALSE);
+    if (!$result) {
+      return FALSE;
+    }
+    return $this->serializer->deserialize($result, SyncList::class, 'json');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createSync(Sync $sync) {
+    return $this->createSerializableObject(__METHOD__, $sync);
+  }
+
+  /**
+   * Create an object in openshift that supports serialization.
+   *
+   * @param string $method
+   *   The method this has been called from.
+   * @param object $object
+   *   The object to create.
+   * @param array $params
+   *   Optional params to pass to createRequestUri.
+   *
+   * @throws \UniversityOfAdelaide\OpenShift\ClientException
+   *   A client exception if the creation failed.
+   *
+   * @return mixed|bool
+   *   Either the object that was created, or false if it failed.
+   */
+  private function createSerializableObject($method, $object, array $params = []) {
+    $resourceMethod = $this->getResourceMethod($method);
+    $uri = $this->createRequestUri($resourceMethod['uri'], $params);
+    $serialized = $this->serializer->serialize($object, 'json');
+    if (!$result = $this->request($resourceMethod['action'], $uri, $serialized, [], FALSE)) {
+      return FALSE;
+    }
+    return $this->serializer->deserialize($result, get_class($object), 'json');
+  }
+
+  /**
    * Merge annotations into the config, if there are any.
    *
    * Applying a blank annotation causes failures, is why this function exists.
@@ -1434,30 +1843,44 @@ class Client implements ClientInterface {
     $volume_mounts = [];
 
     foreach ($volumes as $volume) {
-      if ($volume['type'] === 'pvc') {
-        $volumes_config[] = [
-          'name' => $volume['name'],
-          'persistentVolumeClaim' => [
-            'claimName' => $volume['name'],
-          ],
-        ];
-        $volume_mounts[] = [
-          'mountPath' => $volume['path'],
-          'name' => $volume['name'],
-        ];
-      }
-      elseif ($volume['type'] === 'secret') {
-        $volumes_config[] = [
-          'name' => $volume['name'],
-          'secret' => [
-            'secretName' => $volume['secret'],
-          ],
-        ];
-        $volume_mounts[] = [
-          'mountPath' => $volume['path'],
-          'name' => $volume['name'],
-          'readOnly' => TRUE,
-        ];
+      switch ($volume['type']) {
+        case 'pvc':
+          $volumes_config[] = [
+            'name' => $volume['name'],
+            'persistentVolumeClaim' => [
+              'claimName' => $volume['name'],
+            ],
+          ];
+          $volume_mounts[] = [
+            'mountPath' => $volume['path'],
+            'name' => $volume['name'],
+          ];
+          break;
+
+        case 'secret':
+          $volumes_config[] = [
+            'name' => $volume['name'],
+            'secret' => [
+              'secretName' => $volume['secret'],
+            ],
+          ];
+          $volume_mounts[] = [
+            'mountPath' => $volume['path'],
+            'name' => $volume['name'],
+            'readOnly' => TRUE,
+          ];
+          break;
+
+        case 'empty':
+          // Empty volumes map to the emptyDir type, which is the default.
+          $volumes_config[] = [
+            'name' => $volume['name'],
+          ];
+          $volume_mounts[] = [
+            'mountPath' => $volume['path'],
+            'name' => $volume['name'],
+          ];
+          break;
       }
     }
     return [
@@ -1499,7 +1922,7 @@ class Client implements ClientInterface {
                     'args' => $args,
                     'env' => $data['env_vars'] ?? [],
                     'image' => $image_name,
-                    'imagePullPolicy' => 'Always',
+                    'imagePullPolicy' => 'IfNotPresent',
                     'name' => $name,
                     'resources' =>
                       [
@@ -1532,6 +1955,10 @@ class Client implements ClientInterface {
         $this->generateSecurityContext($data);
     }
 
+    if (array_key_exists('command', $data)) {
+        $job_template['spec']['template']['spec']['containers'][0]['command'] += $data['command'];
+    }
+
     return $job_template;
   }
 
@@ -1544,13 +1971,15 @@ class Client implements ClientInterface {
    *   Name of the item to retrieve.
    * @param string $label
    *   Label of items to retrieve.
+   * @param bool $decode_response
+   *   Whether to decode the response or not.
    *
    * @return array|bool
    *   Return the item, or false if the retrieve failed.
    *
    * @throws \UniversityOfAdelaide\OpenShift\ClientException
    */
-  private function apiCall(string $method, $name = '', $label = NULL) {
+  private function apiCall(string $method, $name = '', $label = NULL, $decode_response = TRUE) {
     $resourceMethod = $this->getResourceMethod($method);
     $uri = $this->createRequestUri($resourceMethod['uri'], [
       'name' => (string) $name,
@@ -1561,6 +1990,7 @@ class Client implements ClientInterface {
       $query = ['labelSelector' => $label];
     }
 
-    return $this->request($resourceMethod['action'], $uri, [], $query);
+    return $this->request($resourceMethod['action'], $uri, NULL, $query, $decode_response);
   }
+
 }

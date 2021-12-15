@@ -2,6 +2,17 @@
 
 namespace UniversityOfAdelaide\OpenShift;
 
+use UniversityOfAdelaide\OpenShift\Objects\Backups\Backup;
+use UniversityOfAdelaide\OpenShift\Objects\Backups\Restore;
+use UniversityOfAdelaide\OpenShift\Objects\Backups\ScheduledBackup;
+use UniversityOfAdelaide\OpenShift\Objects\Backups\Sync;
+use UniversityOfAdelaide\OpenShift\Objects\ConfigMap;
+use UniversityOfAdelaide\OpenShift\Objects\Hpa;
+use UniversityOfAdelaide\OpenShift\Objects\Route;
+use UniversityOfAdelaide\OpenShift\Objects\Label;
+use UniversityOfAdelaide\OpenShift\Objects\NetworkPolicy;
+use UniversityOfAdelaide\OpenShift\Objects\StatefulSet;
+
 /**
  * Interface OpenShiftClientInterface.
  *
@@ -30,10 +41,12 @@ interface ClientInterface {
    *   HTTP VERB.
    * @param string $uri
    *   Path the endpoint.
-   * @param array $body
-   *   Request body to be converted to JSON.
+   * @param mixed $body
+   *   Request body to be converted to JSON. Can be passed in as JSON.
    * @param array $query
    *   Query params.
+   * @param bool $decode_response
+   *   Whether to decode the response or not.
    *
    * @return array|bool
    *   Returns json_decoded body contents or FALSE.
@@ -41,7 +54,7 @@ interface ClientInterface {
    * @throws ClientException
    *   Throws exception if there is an issue performing request.
    */
-  public function request(string $method, string $uri, array $body = [], array $query = []);
+  public function request(string $method, string $uri, $body = NULL, array $query = [], $decode_response = TRUE);
 
   /**
    * Retrieves a secret that matches the name/tag.
@@ -194,26 +207,18 @@ interface ClientInterface {
   public function getRoute(string $name);
 
   /**
-   * Creates a route.
+   * Creates a new NetworkPolicy.
    *
-   * @param string $name
-   *   Name for the route.
-   * @param string $service_name
-   *   The service name to associate with the route.
-   * @param string $domain
-   *   The domain to associate with the route.
-   * @param string $path
-   *   The path to associate with the route. Optional.
-   * @param array $annotations
-   *   An optional array of metadata annotations to add to the route.
+   * @param \UniversityOfAdelaide\OpenShift\Objects\Route $route
+   *   The Route to create.
    *
-   * @return array
-   *   Returns the body response if successful.
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Route|bool
+   *   Returns a Route if successful, false if it fails.
    *
    * @throws ClientException
-   *   Throws exception if there is an issue creating route.
+   *   Throws exception if there is an issue creating the Route.
    */
-  public function createRoute(string $name, string $service_name, string $domain, string $path = NULL, array $annotations = []);
+  public function createRoute(Route $route);
 
   /**
    * Updates an existing named route.
@@ -892,5 +897,357 @@ interface ClientInterface {
    *   Throws exception if there is an issue deleting replication controllers.
    */
   public function deleteReplicationControllers($name, $label);
+
+  /**
+   * Retrieves a backup that matches the name.
+   *
+   * @param string $name
+   *   Name of the backup to retrieved.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Backups\Backup|bool
+   *   Returns a Backup if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue retrieving backup.
+   */
+  public function getBackup(string $name);
+
+  /**
+   * Retrieves a list of backups optionally filtered by selectors.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\Label $label_selector
+   *   An optional label selector to apply to the query.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Backups\BackupList|bool
+   *   Returns a BackupList if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue retrieving the list of backups.
+   */
+  public function listBackup(Label $label_selector = NULL);
+
+  /**
+   * Creates a new backup.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\Backups\Backup $backup
+   *   The backup to create.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Backups\Backup|bool
+   *   Returns a Backup if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue creating the backup.
+   */
+  public function createBackup(Backup $backup);
+
+  /**
+   * Updates an existing backup.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\Backups\Backup $backup
+   *   The backup to update.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Backups\ScheduledBackup|bool
+   *   Returns a Backup if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue updating the Backup.
+   */
+  public function updateBackup(Backup $backup);
+
+  /**
+   * Deletes a named backup.
+   *
+   * @param string $name
+   *   The name backup to delete.
+   *
+   * @return array
+   *   Returns the body response if successful.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue deleting backup.
+   */
+  public function deleteBackup(string $name);
+
+  /**
+   * Creates a new restore.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\Backups\Restore $restore
+   *   The restore to create.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Backups\Restore|bool
+   *   Returns a Restore if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue creating the restore.
+   */
+  public function createRestore(Restore $restore);
+
+  /**
+   * Retrieves a list of restores optionally filtered by selectors.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\Label $label_selector
+   *   An optional label selector to apply to the query.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Backups\RestoreList|bool
+   *   Returns a RestoreList if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue retrieving the list of backups.
+   */
+  public function listRestore(Label $label_selector = NULL);
+
+  /**
+   * Retrieves a schedule that matches the name.
+   *
+   * @param string $name
+   *   Name of the schedule to retrieved.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Backups\ScheduledBackup|bool
+   *   Returns a ScheduledBackup if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue retrieving schedule.
+   */
+  public function getSchedule(string $name);
+
+  /**
+   * Creates a new schedule.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\Backups\ScheduledBackup $schedule
+   *   The schedule to create.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Backups\ScheduledBackup|bool
+   *   Returns a ScheduledBackup if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue creating the ScheduledBackup.
+   */
+  public function createSchedule(ScheduledBackup $schedule);
+
+  /**
+   * Updates an existing schedule.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\Backups\ScheduledBackup $schedule
+   *   The schedule to update.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Backups\ScheduledBackup|bool
+   *   Returns a ScheduledBackup if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue creating the ScheduledBackup.
+   */
+  public function updateSchedule(ScheduledBackup $schedule);
+
+  /**
+   * Deletes a named schedule.
+   *
+   * @param string $name
+   *   The name schedule to delete.
+   * @param bool $cascade
+   *   By default, don't delete all backups associated with a backup schedule.
+   *
+   * @return array
+   *   Returns the body response if successful.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue deleting schedule.
+   */
+  public function deleteSchedule(string $name, bool $cascade = FALSE);
+
+  /**
+   * Updates an existing configmap.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\ConfigMap $configMap
+   *   The configmap to update.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\ConfigMap|bool
+   *   Returns a ConfigMap if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue creating the ConfigMap.
+   */
+  public function updateConfigmap(ConfigMap $configMap);
+
+  /**
+   * Retrieves a configmap that matches the name.
+   *
+   * @param string $name
+   *   Name of the configmap to retrieved.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\ConfigMap|bool
+   *   Returns a ConfigMap if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue retrieving the ConfigMap.
+   */
+  public function getConfigmap(string $name);
+
+  /**
+   * Retrieves a NetworkPolicy that matches the name.
+   *
+   * @param string $name
+   *   Name of the NetworkPolicy to retrieved.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\NetworkPolicy|bool
+   *   Returns a NetworkPolicy if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue retrieving the NetworkPolicy.
+   */
+  public function getNetworkpolicy(string $name);
+
+  /**
+   * Creates a new NetworkPolicy.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\NetworkPolicy $np
+   *   The NetworkPolicy to create.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\NetworkPolicy|bool
+   *   Returns a NetworkPolicy if successful, false if it fails.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue creating the NetworkPolicy.
+   */
+  public function createNetworkpolicy(NetworkPolicy $np);
+
+  /**
+   * Deletes a named NetworkPolicy.
+   *
+   * @param string $name
+   *   The name NetworkPolicy to delete.
+   *
+   * @return array
+   *   Returns the body response if successful.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue deleting NetworkPolicy.
+   */
+  public function deleteNetworkpolicy(string $name);
+
+  /**
+   * Updates an existing StatefulSet.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\StatefulSet $statefulSet
+   *   The StatefulSet to update.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\ConfigMap|bool
+   *   Returns a StatefulSet if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue creating the StatefulSet.
+   */
+  public function updateStatefulset(StatefulSet $statefulSet);
+
+  /**
+   * Retrieves a StatefulSet that matches the name.
+   *
+   * @param string $name
+   *   Name of the StatefulSet to retrieved.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\StatefulSet|bool
+   *   Returns a StatefulSet if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue retrieving the StatefulSet.
+   */
+  public function getStatefulset(string $name);
+
+  /**
+   * Creates a new HPA.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\Hpa $hpa
+   *   The HPA to create.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Hpa|bool
+   *   Returns a HPA if successful, false if it fails.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue creating the HPA.
+   */
+  public function createHpa(Hpa $hpa);
+
+  /**
+   * Deletes a named HPA.
+   *
+   * @param string $name
+   *   The name HPA to delete.
+   *
+   * @return array
+   *   Returns the body response if successful.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue deleting HPA.
+   */
+  public function deleteHpa(string $name);
+
+  /**
+   * Retrieves a HPA that matches the name.
+   *
+   * @param string $name
+   *   Name of the HPA to retrieved.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Hpa|bool
+   *   Returns a HPA if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue retrieving the HPA.
+   */
+  public function getHpa(string $name);
+
+  /**
+   * Updates an HPA.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\Hpa $hpa
+   *   The HPA to update.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Hpa|bool
+   *   Returns a HPA if successful, false if it fails.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue updating the HPA.
+   */
+  public function updateHpa(Hpa $hpa);
+
+  /**
+   * Retrieves a sync that matches the name.
+   *
+   * @param string $name
+   *   Name of the sync to retrieved.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Backups\Sync|bool
+   *   Returns a Sync if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue retrieving sync.
+   */
+  public function getSync(string $name);
+
+  /**
+   * Retrieves a list of syncs optionally filtered by selectors.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\Label|null $label_selector
+   *   An optional label selector to apply to the query.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Backups\SyncList|bool
+   *   Returns a SyncList if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue retrieving the list of syncs.
+   */
+  public function listSync(Label $label_selector = NULL);
+
+  /**
+   * Creates a new sync.
+   *
+   * @param \UniversityOfAdelaide\OpenShift\Objects\Backups\Sync $sync
+   *   The sync to create.
+   *
+   * @return \UniversityOfAdelaide\OpenShift\Objects\Backups\Backup|bool
+   *   Returns a Sync if successful, false if it does not exist.
+   *
+   * @throws ClientException
+   *   Throws exception if there is an issue creating the sync.
+   */
+  public function createSync(Sync $sync);
 
 }
