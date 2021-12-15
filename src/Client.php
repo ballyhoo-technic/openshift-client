@@ -1955,6 +1955,10 @@ class Client implements ClientInterface {
         $this->generateSecurityContext($data);
     }
 
+    if (array_key_exists('command', $data)) {
+        $job_template['spec']['template']['spec']['containers'][0]['command'] += $data['command'];
+    }
+
     return $job_template;
   }
 
