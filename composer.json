@@ -1,5 +1,5 @@
 {
-    "name": "ballyhoo-techic/openshift-client",
+    "name": "ballyhoo-technic/openshift-client",
     "description": "Simple OpenShift client for PHP. Fork of: https://github.com/universityofadelaide/openshift-client",
     "type": "library",
     "license": "MIT",
