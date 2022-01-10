@@ -1956,7 +1956,7 @@ class Client implements ClientInterface {
     }
 
     if (array_key_exists('command', $data)) {
-        $job_template['spec']['template']['spec']['containers'][0]['command'] += $data['command'];
+        $job_template['spec']['template']['spec']['containers'][0]['command'] = $data['command'];
     }
 
     return $job_template;
