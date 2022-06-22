@@ -5,7 +5,7 @@ namespace UniversityOfAdelaide\OpenShift\Objects;
 /**
  * Value object for a OS label.
  */
-class Label {
+class Annotation {
 
     /**
      * The label key.
@@ -22,17 +22,17 @@ class Label {
     protected string $value;
 
     /**
-     * Create a label from a key and value.
+     * Create a annotation from a key and value.
      *
      * @param string $key
      *   The key.
      * @param string $value
      *   The label.
      *
-     * @return Label
+     * @return Annotation The object.
      *   The object.
      */
-    public static function create(string $key, string $value): Label {
+    public static function create(string $key, string $value): Annotation {
         $instance = new static();
         $instance->setKey($key)->setValue($value);
         return $instance;
@@ -57,7 +57,7 @@ class Label {
      * @return Label
      *   The calling class.
      */
-    public function setKey(string $key): Label {
+    public function setKey(string $key): Annotation {
         $this->key = $key;
         return $this;
     }
@@ -81,7 +81,7 @@ class Label {
      * @return Label
      *   The calling class.
      */
-    public function setValue(string $value): Label {
+    public function setValue(string $value): Annotation {
         $this->value = $value;
         return $this;
     }

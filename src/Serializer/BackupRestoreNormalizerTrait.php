@@ -4,6 +4,7 @@ namespace UniversityOfAdelaide\OpenShift\Serializer;
 
 use UniversityOfAdelaide\OpenShift\Objects\Backups\BackupObjectBase;
 use UniversityOfAdelaide\OpenShift\Objects\Backups\Database;
+use UniversityOfAdelaide\OpenShift\Objects\Backups\ScheduledBackup;
 
 /**
  * Trait for common functionality between backup/restore normalization.
@@ -13,13 +14,13 @@ trait BackupRestoreNormalizerTrait {
   /**
    * Normalize the backup object's retention.
    *
-   * @param \UniversityOfAdelaide\OpenShift\Objects\Backups\BackupObjectBase $object
+   * @param BackupObjectBase $object
    *   The backup object.
    *
    * @return array
    *   Normalized retention.
    */
-  protected function normalizeRetention(BackupObjectBase $object) {
+  protected function normalizeRetention(BackupObjectBase $object): array {
     return [
       'maxNumber' => (int) $object->getRetention(),
     ];
@@ -28,13 +29,13 @@ trait BackupRestoreNormalizerTrait {
   /**
    * Normalize the backup object's schedule.
    *
-   * @param \UniversityOfAdelaide\OpenShift\Objects\Backups\BackupObjectBase $object
+   * @param ScheduledBackup $object
    *   The backup object.
    *
    * @return array
    *   Normalized schedule.
    */
-  protected function normalizeSchedule(BackupObjectBase $object) {
+  protected function normalizeSchedule(ScheduledBackup $object): array {
     return [
       'crontab' => $object->getSchedule(),
       'startingDeadlineSeconds' => $object->getStartingDeadlineSeconds(),
@@ -50,9 +51,8 @@ trait BackupRestoreNormalizerTrait {
    * @return array
    *   Normalized volumes.
    */
-  protected function normalizeVolumes(array $volumes) {
+  protected function normalizeVolumes(array $volumes): array {
     $ret = [];
-    /** @var \UniversityOfAdelaide\OpenShift\Objects\Backups\BackupObjectBase $object */
     foreach ($volumes as $volumeId => $claimName) {
       $ret[$volumeId] = ['claimName' => $claimName];
     }
@@ -68,7 +68,7 @@ trait BackupRestoreNormalizerTrait {
    * @return array
    *   Normalized mysqls.
    */
-  protected function normalizeMysqls(array $mysqls) {
+  protected function normalizeMysqls(array $mysqls): array {
     return array_reduce($mysqls, function ($carry, Database $db) {
       $carry[$db->getId()] = [
         'secret' => [

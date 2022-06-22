@@ -10,31 +10,31 @@ use Symfony\Component\Serializer\Serializer;
  */
 class OpenShiftSerializerFactory {
 
-  /**
-   * Creates a Serializer object.
-   *
-   * @return \Symfony\Component\Serializer\Serializer
-   *   Returns the Serializer object.
-   */
-  public static function create() {
-    $encoders = [
-      new JsonEncoder(),
-    ];
-    $normalizers = [
-      new BackupNormalizer(),
-      new BackupListNormalizer(),
-      new ConfigMapNormalizer(),
-      new NetworkPolicyNormalizer(),
-      new RestoreNormalizer(),
-      new RestoreListNormalizer(),
-      new RouteNormalizer(),
-      new ScheduledBackupNormalizer(),
-      new StatefulSetNormalizer(),
-      new HpaNormalizer(),
-      new SyncNormalizer(),
-      new SyncListNormalizer(),
-    ];
-    return new Serializer($normalizers, $encoders);
-  }
+    /**
+     * Creates a Serializer object.
+     *
+     * @return Serializer
+     *   Returns the Serializer object.
+     */
+    public static function create(): Serializer {
+        $encoders = [
+            new JsonEncoder(),
+        ];
+        $normalizers = [
+            new BackupNormalizer(),
+            new BackupListNormalizer(),
+            new ConfigMapNormalizer(),
+            new NetworkPolicyNormalizer(),
+            new RestoreNormalizer(),
+            new RestoreListNormalizer(),
+            new RouteNormalizer(),
+            new ScheduledBackupNormalizer(),
+            new StatefulSetNormalizer(),
+            new HpaNormalizer(),
+            new SyncNormalizer(),
+            new SyncListNormalizer(),
+        ];
+        return new Serializer($normalizers, $encoders);
+    }
 
 }
