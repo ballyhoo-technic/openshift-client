@@ -9,54 +9,54 @@ use UniversityOfAdelaide\OpenShift\Objects\Route;
  */
 class RouteNormalizer extends BaseNormalizer {
 
-  /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = Route::class;
+    /**
+     * {@inheritdoc}
+     */
+    protected string|array $supportedInterfaceOrClass = Route::class;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
-    /** @var \UniversityOfAdelaide\OpenShift\Objects\Route $route */
-    $route = Route::create();
-    $route->setName($data['metadata']['name']);
-    return $route;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function denormalize($data, $class, $format = NULL, array $context = []): Route {
+        /** @var Route $route */
+        $route = Route::create();
+        $route->setName($data['metadata']['name']);
+        return $route;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function normalize($object, $format = NULL, array $context = []) {
-    /** @var \UniversityOfAdelaide\OpenShift\Objects\Route $object */
-    $data = [
-      'apiVersion' => 'v1',
-      'kind' => 'Route',
-      'metadata' => [
-        'name' => $object->getName(),
-      ],
-      'spec' => [
-        'host' => $object->getHost(),
-        'path' => $object->getPath(),
-        'tls' => [
-          'insecureEdgeTerminationPolicy' => $object->getInsecureEdgeTerminationPolicy(),
-          'termination' => $object->getTermination(),
-        ],
-        'to' => [
-          'kind' => $object->getToKind(),
-          'name' => $object->getToName(),
-          'weight' => $object->getToWeight(),
-        ],
-        'wildcardPolicy' => $object->getWildcardPolicy(),
-      ],
-    ];
-    if ($object->getLabels()) {
-      $data['metadata']['labels'] = $object->getLabels();
+    /**
+     * {@inheritdoc}
+     */
+    public function normalize($object, $format = NULL, array $context = []): array {
+        /** @var Route $object */
+        $data = [
+            'apiVersion' => 'v1',
+            'kind' => 'Route',
+            'metadata' => [
+                'name' => $object->getName(),
+            ],
+            'spec' => [
+                'host' => $object->getHost(),
+                'path' => $object->getPath(),
+                'tls' => [
+                    'insecureEdgeTerminationPolicy' => $object->getInsecureEdgeTerminationPolicy(),
+                    'termination' => $object->getTermination(),
+                ],
+                'to' => [
+                    'kind' => $object->getToKind(),
+                    'name' => $object->getToName(),
+                    'weight' => $object->getToWeight(),
+                ],
+                'wildcardPolicy' => $object->getWildcardPolicy(),
+            ],
+        ];
+        if ($object->getLabels()) {
+            $data['metadata']['labels'] = $object->getLabels();
+        }
+        if ($object->getAnnotations()) {
+            $data['metadata']['annotations'] = $object->getAnnotations();
+        }
+        return $data;
     }
-    if ($object->getAnnotations()) {
-      $data['metadata']['annotations'] = $object->getAnnotations();
-    }
-    return $data;
-  }
 
 }

@@ -9,20 +9,20 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 abstract class BaseNormalizer extends AbstractNormalizer {
 
-  use ClassNameSupportNormalizerTrait;
+    use ClassNameSupportNormalizerTrait;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
-    throw new \RuntimeException("Method not implemented.");
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function denormalize($data, $class, $format = NULL, array $context = []) {
+        throw new \RuntimeException("Method not implemented.");
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function normalize($object, $format = NULL, array $context = []) {
-    throw new \RuntimeException("Method not implemented.");
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function normalize($object, $format = NULL, array $context = []) {
+        throw new \RuntimeException("Method not implemented.");
+    }
 
 }

@@ -10,22 +10,22 @@ use UniversityOfAdelaide\OpenShift\Objects\Backups\BackupList;
  */
 class BackupListNormalizer extends BaseNormalizer {
 
-  /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = BackupList::class;
+    /**
+     * {@inheritdoc}
+     */
+    protected $supportedInterfaceOrClass = BackupList::class;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
-    $backups = BackupList::create();
+    /**
+     * {@inheritdoc}
+     */
+    public function denormalize($data, $class, $format = NULL, array $context = []): BackupList {
+        $backups = BackupList::create();
 
-    foreach ($data['items'] as $backupData) {
-      $backups->addBackup($this->serializer->denormalize($backupData, Backup::class));
+        foreach ($data['items'] as $backupData) {
+            $backups->addBackup($this->serializer->denormalize($backupData, Backup::class));
+        }
+
+        return $backups;
     }
-
-    return $backups;
-  }
 
 }

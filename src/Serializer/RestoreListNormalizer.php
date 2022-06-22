@@ -10,22 +10,22 @@ use UniversityOfAdelaide\OpenShift\Objects\Backups\RestoreList;
  */
 class RestoreListNormalizer extends BaseNormalizer {
 
-  /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = RestoreList::class;
+    /**
+     * {@inheritdoc}
+     */
+    protected string|array $supportedInterfaceOrClass = RestoreList::class;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
-    $restores = RestoreList::create();
+    /**
+     * {@inheritdoc}
+     */
+    public function denormalize($data, $class, $format = NULL, array $context = []): RestoreList {
+        $restores = RestoreList::create();
 
-    foreach ($data['items'] as $restoreData) {
-      $restores->addRestore($this->serializer->denormalize($restoreData, Restore::class));
+        foreach ($data['items'] as $restoreData) {
+            $restores->addRestore($this->serializer->denormalize($restoreData, Restore::class));
+        }
+
+        return $restores;
     }
-
-    return $restores;
-  }
 
 }

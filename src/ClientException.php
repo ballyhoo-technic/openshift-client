@@ -2,18 +2,20 @@
 
 namespace UniversityOfAdelaide\OpenShift;
 
+use Exception;
+
 /**
  * OpenShift client exception.
  */
-class ClientException extends \Exception {
+class ClientException extends Exception {
 
   /** @var string */
-  private $body;
+  private string $body;
 
   public function __construct(
     $message,
     $code,
-    \Exception $previous = NULL,
+    Exception $previous = NULL,
     string $body = ''
   ) {
     parent::__construct($message, $code, $previous);
@@ -26,7 +28,7 @@ class ClientException extends \Exception {
    * @return string|null
    *   Returns the response body if set, null otherwise.
    */
-  public function getBody() {
+  public function getBody(): ?string {
     return $this->body;
   }
 
@@ -36,7 +38,7 @@ class ClientException extends \Exception {
    * @return bool
    *   True if the body is set.
    */
-  public function hasBody() {
+  public function hasBody(): bool {
     return $this->body !== NULL;
   }
 

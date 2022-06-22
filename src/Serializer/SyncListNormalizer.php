@@ -10,22 +10,22 @@ use UniversityOfAdelaide\OpenShift\Objects\Backups\SyncList;
  */
 class SyncListNormalizer extends BaseNormalizer {
 
-  /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = SyncList::class;
+    /**
+     * {@inheritdoc}
+     */
+    protected string|array $supportedInterfaceOrClass = SyncList::class;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
-    $syncs = SyncList::create();
+    /**
+     * {@inheritdoc}
+     */
+    public function denormalize($data, $class, $format = NULL, array $context = []): SyncList {
+        $syncs = SyncList::create();
 
-    foreach ($data['items'] as $syncData) {
-      $syncs->addSync($this->serializer->denormalize($syncData, Sync::class));
+        foreach ($data['items'] as $syncData) {
+            $syncs->addSync($this->serializer->denormalize($syncData, Sync::class));
+        }
+
+        return $syncs;
     }
-
-    return $syncs;
-  }
 
 }
