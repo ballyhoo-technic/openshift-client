@@ -15,7 +15,7 @@ class BackupNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    protected $supportedInterfaceOrClass = Backup::class;
+    protected string|array $supportedInterfaceOrClass = Backup::class;
 
     /**
      * {@inheritdoc}
