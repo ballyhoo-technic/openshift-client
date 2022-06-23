@@ -13,7 +13,7 @@ class BackupListNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    protected $supportedInterfaceOrClass = BackupList::class;
+    protected string|array $supportedInterfaceOrClass = BackupList::class;
 
     /**
      * {@inheritdoc}
