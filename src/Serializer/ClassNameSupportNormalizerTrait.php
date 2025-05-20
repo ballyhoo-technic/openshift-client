@@ -27,10 +27,10 @@ trait ClassNameSupportNormalizerTrait {
     /**
      * Sets the string or array of supported classes.
      *
-     * @param array|string $supported_interface_or_class
+     * @param  array|string  $supported_interface_or_class
      *   The string or array of supported classes.
      *
-     * @return $this
+     * @return BaseNormalizer|ClassNameSupportNormalizerTrait The current object.
      *   The current object.
      */
     public function setSupportedInterfaceOrClass(array|string $supported_interface_or_class): self {

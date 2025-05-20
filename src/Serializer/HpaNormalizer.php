@@ -17,7 +17,7 @@ class HpaNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = NULL, array $context = []): Hpa {
+    public function denormalize($data, $type, $format = NULL, array $context = []): Hpa {
         /** @var Hpa $hpa */
         $hpa = Hpa::create()->setName($data['metadata']['name']);
         return $hpa;
@@ -26,29 +26,33 @@ class HpaNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = NULL, array $context = []): array {
-        /** @var Hpa $object */
-        $data = [
+    public function normalize($data, $format = NULL, array $context = []): array {
+        /** @var Hpa $data */
+        $object = [
             'apiVersion' => 'autoscaling/v1',
             'kind' => 'HorizontalPodAutoscaler',
             'metadata' => [
-                'name' => $object->getName(),
+                'name' => $data->getName(),
             ],
             'spec' => [
-                'minReplicas' => $object->getMinReplicas(),
-                'maxReplicas' => $object->getMaxReplicas(),
+                'minReplicas' => $data->getMinReplicas(),
+                'maxReplicas' => $data->getMaxReplicas(),
                 'scaleTargetRef' => [
                     'apiVersion' => 'apps.openshift.io/v1',
                     'kind' => 'DeploymentConfig',
-                    'name' => $object->getName(),
+                    'name' => $data->getName(),
                 ],
-                'targetCPUUtilizationPercentage' => $object->getTargetCpu(),
+                'targetCPUUtilizationPercentage' => $data->getTargetCpu(),
             ],
         ];
-        if ($object->getLabels()) {
-            $data['metadata']['labels'] = $object->getLabels();
+        if ($data->getLabels()) {
+            $object['metadata']['labels'] = $data->getLabels();
         }
-        return $data;
+        return $object;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        // TODO: Implement getSupportedTypes() method.
+    }
 }

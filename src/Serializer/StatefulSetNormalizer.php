@@ -17,7 +17,7 @@ class StatefulSetNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = NULL, array $context = []): StatefulSet {
+    public function denormalize($data, $type, $format = NULL, array $context = []): StatefulSet {
         /** @var StatefulSet $configMap */
         $configMap = StatefulSet::create();
         $configMap->setName($data['metadata']['name'])
@@ -31,27 +31,31 @@ class StatefulSetNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = NULL, array $context = []): array {
+    public function normalize($data, $format = NULL, array $context = []): array {
         // If securityContext is empty, it must be an object.
         // Replace with preserve_empty_objects in the client when
         // symfony/serializer is updated.
         // @see https://github.com/symfony/symfony/pull/28363/files#diff-cf0df583a97c223ac656cd9228cc4966R206
-        $spec = $object->getSpec();
+        $spec = $data->getSpec();
         if (empty($spec['template']['spec']['securityContext'])) {
             $spec['template']['spec']['securityContext'] = new \stdClass();
         }
 
-        /** @var StatefulSet $object */
-        $data = [
+        /** @var StatefulSet $data */
+        $object = [
             'apiVersion' => 'apps/v1',
             'kind' => 'StatefulSet',
             'metadata' => [
-                'name' => $object->getName(),
-                'labels' => $object->getLabels(),
+                'name' => $data->getName(),
+                'labels' => $data->getLabels(),
             ],
             'spec' => $spec,
         ];
-        return $data;
+        return $object;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        // TODO: Implement getSupportedTypes() method.
+    }
 }

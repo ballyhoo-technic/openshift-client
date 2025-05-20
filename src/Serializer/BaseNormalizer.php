@@ -14,14 +14,16 @@ abstract class BaseNormalizer extends AbstractNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = NULL, array $context = []) {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
+    {
         throw new \RuntimeException("Method not implemented.");
     }
 
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = NULL, array $context = []) {
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    {
         throw new \RuntimeException("Method not implemented.");
     }
 

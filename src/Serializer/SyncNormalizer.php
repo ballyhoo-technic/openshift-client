@@ -23,7 +23,7 @@ class SyncNormalizer extends BaseNormalizer implements NormalizationAwareInterfa
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = NULL, array $context = []): Sync {
+    public function denormalize($data, $type, $format = NULL, array $context = []): Sync {
         /** @var Sync $sync */
         $sync = Sync::create();
         $sync->setName($data['metadata']['name'])
@@ -66,31 +66,33 @@ class SyncNormalizer extends BaseNormalizer implements NormalizationAwareInterfa
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = NULL, array $context = []): array {
-        /** @var Sync $object */
-        $data = [
+    public function normalize($data, $format = NULL, array $context = []): array {
+        /** @var Sync $data */
+        return [
             'apiVersion' => 'extension.shepherd/v1',
             'kind' => 'Sync',
             'metadata' => [
-                'labels' => $object->getLabels(),
-                'name' => $object->getName(),
+                'labels' => $data->getLabels(),
+                'name' => $data->getName(),
             ],
             'spec' => [
-                'site' => $object->getSite(),
-                'backupEnv' => $object->getBackupEnv(),
-                'restoreEnv' => $object->getRestoreEnv(),
+                'site' => $data->getSite(),
+                'backupEnv' => $data->getBackupEnv(),
+                'restoreEnv' => $data->getRestoreEnv(),
                 'backupSpec' => [
-                    'volumes' => $this->normalizeVolumes($object->getBackupVolumes()),
-                    'mysql' => $this->normalizeMysqls($object->getBackupDatabases()),
+                    'volumes' => $this->normalizeVolumes($data->getBackupVolumes()),
+                    'mysql' => $this->normalizeMysqls($data->getBackupDatabases()),
                 ],
                 'restoreSpec' => [
-                    'volumes' => $this->normalizeVolumes($object->getRestoreVolumes()),
-                    'mysql' => $this->normalizeMysqls($object->getRestoreDatabases()),
+                    'volumes' => $this->normalizeVolumes($data->getRestoreVolumes()),
+                    'mysql' => $this->normalizeMysqls($data->getRestoreDatabases()),
                 ],
             ],
         ];
-
-        return $data;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        // TODO: Implement getSupportedTypes() method.
+    }
 }
