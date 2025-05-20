@@ -20,7 +20,7 @@ class ScheduledBackupNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = NULL, array $context = []): ScheduledBackup {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): ScheduledBackup {
         /** @var ScheduledBackup $schedule */
         $schedule = ScheduledBackup::create();
         $schedule->setName($data['metadata']['name'])
@@ -44,9 +44,9 @@ class ScheduledBackupNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = NULL, array $context = []): array {
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array {
         /** @var ScheduledBackup $data */
-        $object = [
+        return [
             'apiVersion' => 'extension.shepherd/v1',
             'kind' => 'BackupScheduled',
             'metadata' => [
@@ -60,8 +60,6 @@ class ScheduledBackupNormalizer extends BaseNormalizer {
                 'mysql' => $this->normalizeMysqls($data->getDatabases()),
             ],
         ];
-
-        return $object;
     }
 
     public function getSupportedTypes(?string $format): array

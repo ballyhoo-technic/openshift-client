@@ -17,7 +17,7 @@ class RouteNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = NULL, array $context = []): Route {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Route {
         /** @var Route $route */
         $route = Route::create();
         $route->setName($data['metadata']['name']);
@@ -27,7 +27,7 @@ class RouteNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = NULL, array $context = []): array {
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array {
         /** @var Route $data */
         $object = [
             'apiVersion' => 'v1',

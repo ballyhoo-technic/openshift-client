@@ -17,7 +17,7 @@ class ConfigMapNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = NULL, array $context = []): ConfigMap {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): ConfigMap {
         /** @var ConfigMap $configMap */
         $configMap = ConfigMap::create();
         $configMap->setName($data['metadata']['name'])
@@ -31,7 +31,7 @@ class ConfigMapNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = NULL, array $context = []): array {
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null {
         /** @var ConfigMap $data */
         $object = [
             'apiVersion' => 'v1',

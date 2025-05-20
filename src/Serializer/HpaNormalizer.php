@@ -17,7 +17,7 @@ class HpaNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = NULL, array $context = []): Hpa {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Hpa {
         /** @var Hpa $hpa */
         $hpa = Hpa::create()->setName($data['metadata']['name']);
         return $hpa;
@@ -26,7 +26,7 @@ class HpaNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = NULL, array $context = []): array {
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array {
         /** @var Hpa $data */
         $object = [
             'apiVersion' => 'autoscaling/v1',

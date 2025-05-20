@@ -19,7 +19,7 @@ class RestoreNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = NULL, array $context = []): Restore {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Restore {
         /** @var Restore $restore */
         $restore = Restore::create();
         $restore->setName($data['metadata']['name'])
@@ -35,9 +35,9 @@ class RestoreNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = NULL, array $context = []): array {
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array {
         /** @var Restore $data */
-        $object = [
+        return [
             'apiVersion' => 'extension.shepherd/v1',
             'kind' => 'Restore',
             'metadata' => [
@@ -50,8 +50,6 @@ class RestoreNormalizer extends BaseNormalizer {
                 'backupName' => $data->getBackupName(),
             ],
         ];
-
-        return $object;
     }
 
     public function getSupportedTypes(?string $format): array

@@ -20,7 +20,7 @@ class BackupNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = NULL, array $context = []): Backup {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Backup {
         /** @var Backup $backup */
         $backup = Backup::create();
         $backup->setName($data['metadata']['name'])
@@ -47,7 +47,7 @@ class BackupNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = NULL, array $context = []): array {
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array {
         /** @var Backup $data */
         $object = [
             'apiVersion' => 'extension.shepherd/v1',

@@ -17,7 +17,7 @@ class StatefulSetNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = NULL, array $context = []): StatefulSet {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): StatefulSet {
         /** @var StatefulSet $configMap */
         $configMap = StatefulSet::create();
         $configMap->setName($data['metadata']['name'])
@@ -31,7 +31,7 @@ class StatefulSetNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = NULL, array $context = []): array {
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array {
         // If securityContext is empty, it must be an object.
         // Replace with preserve_empty_objects in the client when
         // symfony/serializer is updated.
@@ -42,7 +42,7 @@ class StatefulSetNormalizer extends BaseNormalizer {
         }
 
         /** @var StatefulSet $data */
-        $object = [
+        return [
             'apiVersion' => 'apps/v1',
             'kind' => 'StatefulSet',
             'metadata' => [
@@ -51,7 +51,6 @@ class StatefulSetNormalizer extends BaseNormalizer {
             ],
             'spec' => $spec,
         ];
-        return $object;
     }
 
     public function getSupportedTypes(?string $format): array

@@ -17,7 +17,7 @@ class NetworkPolicyNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = NULL, array $context = []): NetworkPolicy {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): NetworkPolicy {
         /** @var NetworkPolicy $np */
         $np = NetworkPolicy::create();
         $np->setName($data['metadata']['name']);

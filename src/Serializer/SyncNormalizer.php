@@ -23,7 +23,7 @@ class SyncNormalizer extends BaseNormalizer implements NormalizationAwareInterfa
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = NULL, array $context = []): Sync {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Sync {
         /** @var Sync $sync */
         $sync = Sync::create();
         $sync->setName($data['metadata']['name'])
@@ -66,7 +66,7 @@ class SyncNormalizer extends BaseNormalizer implements NormalizationAwareInterfa
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = NULL, array $context = []): array {
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array {
         /** @var Sync $data */
         return [
             'apiVersion' => 'extension.shepherd/v1',

@@ -18,7 +18,7 @@ class SyncListNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = NULL, array $context = []): SyncList {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): SyncList {
         $syncs = SyncList::create();
 
         foreach ($data['items'] as $syncData) {
