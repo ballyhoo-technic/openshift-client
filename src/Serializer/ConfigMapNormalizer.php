@@ -17,7 +17,7 @@ class ConfigMapNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = NULL, array $context = []): ConfigMap {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): ConfigMap {
         /** @var ConfigMap $configMap */
         $configMap = ConfigMap::create();
         $configMap->setName($data['metadata']['name'])
@@ -31,20 +31,24 @@ class ConfigMapNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = NULL, array $context = []): array {
-        /** @var ConfigMap $object */
-        $data = [
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null {
+        /** @var ConfigMap $data */
+        $object = [
             'apiVersion' => 'v1',
             'kind' => 'ConfigMap',
             'metadata' => [
-                'name' => $object->getName(),
+                'name' => $data->getName(),
             ],
-            'data' => $object->getData(),
+            'data' => $data->getData(),
         ];
-        if (!empty($object->getLabels())) {
-            $data['metadata']['labels'] = $object->getLabels();
+        if (!empty($data->getLabels())) {
+            $object['metadata']['labels'] = $data->getLabels();
         }
-        return $data;
+        return $object;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        // TODO: Implement getSupportedTypes() method.
+    }
 }

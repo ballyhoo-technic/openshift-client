@@ -10,12 +10,12 @@ class Backup extends BackupObjectBase {
     /**
      * The name of the label to determine whether the backup is manual.
      */
-    const MANUAL_LABEL = 'is-manual';
+    const string MANUAL_LABEL = 'is-manual';
 
     /**
      * The name of the label to determine whether the backup is sync.
      */
-    const SYNC_LABEL = 'is-sync';
+    const string SYNC_LABEL = 'is-sync';
 
     /**
      * An array of annotations to apply to this backup.

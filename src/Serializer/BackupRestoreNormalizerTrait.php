@@ -52,11 +52,9 @@ trait BackupRestoreNormalizerTrait {
    *   Normalized volumes.
    */
   protected function normalizeVolumes(array $volumes): array {
-    $ret = [];
-    foreach ($volumes as $volumeId => $claimName) {
-      $ret[$volumeId] = ['claimName' => $claimName];
-    }
-    return $ret;
+      return array_map(function ($claimName) {
+          return ['claimName' => $claimName];
+      }, $volumes);
   }
 
   /**

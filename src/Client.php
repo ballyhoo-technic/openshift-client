@@ -4,6 +4,7 @@ namespace UniversityOfAdelaide\OpenShift;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\RequestException;
+use Symfony\Component\Serializer\Serializer;
 use UniversityOfAdelaide\OpenShift\Objects\Backups\Backup;
 use UniversityOfAdelaide\OpenShift\Objects\Backups\BackupList;
 use UniversityOfAdelaide\OpenShift\Objects\Backups\Restore;
@@ -53,16 +54,16 @@ class Client implements ClientInterface {
     /**
      * Guzzle HTTP Client.
      *
-     * @var \GuzzleHttp\Client
+     * @var GuzzleClient
      */
     protected GuzzleClient $guzzleClient;
 
     /**
      * The serializer.
      *
-     * @var \Symfony\Component\Serializer\Serializer
+     * @var Serializer
      */
-    protected \Symfony\Component\Serializer\Serializer $serializer;
+    protected Serializer $serializer;
 
     /**
      * Resource map.
@@ -469,7 +470,7 @@ class Client implements ClientInterface {
     /**
      * Returns the guzzle client.
      *
-     * @return \GuzzleHttp\Client
+     * @return GuzzleClient
      *   Return the guzzle client.
      */
     public function getGuzzleClient(): GuzzleClient {
@@ -919,7 +920,7 @@ class Client implements ClientInterface {
      * {@inheritdoc}
      */
     public function generateImageStreamConfig(string $name): array {
-        $imageStream = [
+        return [
             'apiVersion' => 'v1',
             'kind' => 'ImageStream',
             'metadata' => [
@@ -932,8 +933,6 @@ class Client implements ClientInterface {
                 'dockerImageRepository' => '',
             ],
         ];
-
-        return $imageStream;
     }
 
     /**

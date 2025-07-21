@@ -27,10 +27,10 @@ trait ClassNameSupportNormalizerTrait {
     /**
      * Sets the string or array of supported classes.
      *
-     * @param array|string $supported_interface_or_class
+     * @param  array|string  $supported_interface_or_class
      *   The string or array of supported classes.
      *
-     * @return $this
+     * @return BaseNormalizer|ClassNameSupportNormalizerTrait The current object.
      *   The current object.
      */
     public function setSupportedInterfaceOrClass(array|string $supported_interface_or_class): self {
@@ -41,7 +41,7 @@ trait ClassNameSupportNormalizerTrait {
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = NULL): bool {
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool {
         // If we aren't dealing with an object or the format is not supported return
         // now.
         if (!is_object($data)) {
@@ -58,7 +58,7 @@ trait ClassNameSupportNormalizerTrait {
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = NULL): bool {
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool {
         $supported = (array)$this->supportedInterfaceOrClass;
 
         $subclass_check = function ($name) use ($type) {

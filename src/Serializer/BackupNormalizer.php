@@ -20,7 +20,7 @@ class BackupNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = NULL, array $context = []): Backup {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Backup {
         /** @var Backup $backup */
         $backup = Backup::create();
         $backup->setName($data['metadata']['name'])
@@ -47,25 +47,29 @@ class BackupNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = NULL, array $context = []): array {
-        /** @var Backup $object */
-        $data = [
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array {
+        /** @var Backup $data */
+        $object = [
             'apiVersion' => 'extension.shepherd/v1',
             'kind' => 'Backup',
             'metadata' => [
-                'labels' => $object->getLabels(),
-                'name' => $object->getName(),
+                'labels' => $data->getLabels(),
+                'name' => $data->getName(),
             ],
             'spec' => [
-                'volumes' => $this->normalizeVolumes($object->getVolumes()),
-                'mysql' => $this->normalizeMysqls($object->getDatabases()),
+                'volumes' => $this->normalizeVolumes($data->getVolumes()),
+                'mysql' => $this->normalizeMysqls($data->getDatabases()),
             ],
         ];
-        if ($object->hasAnnotations()) {
-            $data['metadata']['annotations'] = $object->getAnnotations();
+        if ($data->hasAnnotations()) {
+            $object['metadata']['annotations'] = $data->getAnnotations();
         }
 
-        return $data;
+        return $object;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        // TODO: Implement getSupportedTypes() method.
+    }
 }

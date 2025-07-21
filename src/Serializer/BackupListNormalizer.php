@@ -18,7 +18,7 @@ class BackupListNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = NULL, array $context = []): BackupList {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): BackupList {
         $backups = BackupList::create();
 
         foreach ($data['items'] as $backupData) {
@@ -28,4 +28,8 @@ class BackupListNormalizer extends BaseNormalizer {
         return $backups;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        // TODO: Implement getSupportedTypes() method.
+    }
 }

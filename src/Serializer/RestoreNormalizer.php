@@ -19,7 +19,7 @@ class RestoreNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = NULL, array $context = []): Restore {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Restore {
         /** @var Restore $restore */
         $restore = Restore::create();
         $restore->setName($data['metadata']['name'])
@@ -35,23 +35,25 @@ class RestoreNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = NULL, array $context = []): array {
-        /** @var Restore $object */
-        $data = [
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array {
+        /** @var Restore $data */
+        return [
             'apiVersion' => 'extension.shepherd/v1',
             'kind' => 'Restore',
             'metadata' => [
-                'labels' => $object->getLabels(),
-                'name' => $object->getName(),
+                'labels' => $data->getLabels(),
+                'name' => $data->getName(),
             ],
             'spec' => [
-                'volumes' => $this->normalizeVolumes($object->getVolumes()),
-                'mysql' => $this->normalizeMysqls($object->getDatabases()),
-                'backupName' => $object->getBackupName(),
+                'volumes' => $this->normalizeVolumes($data->getVolumes()),
+                'mysql' => $this->normalizeMysqls($data->getDatabases()),
+                'backupName' => $data->getBackupName(),
             ],
         ];
-
-        return $data;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        // TODO: Implement getSupportedTypes() method.
+    }
 }

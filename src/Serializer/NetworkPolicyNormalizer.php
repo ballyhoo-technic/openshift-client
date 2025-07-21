@@ -17,7 +17,7 @@ class NetworkPolicyNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = NULL, array $context = []): NetworkPolicy {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): NetworkPolicy {
         /** @var NetworkPolicy $np */
         $np = NetworkPolicy::create();
         $np->setName($data['metadata']['name']);
@@ -27,13 +27,13 @@ class NetworkPolicyNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = NULL, array $context = []): array {
-        /** @var NetworkPolicy $object */
-        $data = [
+    public function normalize($data, $format = NULL, array $context = []): array {
+        /** @var NetworkPolicy $data */
+        $object = [
             'apiVersion' => 'extensions/v1beta1',
             'kind' => 'NetworkPolicy',
             'metadata' => [
-                'name' => $object->getName(),
+                'name' => $data->getName(),
             ],
             'spec' => [
                 'ingress' => [
@@ -41,30 +41,34 @@ class NetworkPolicyNormalizer extends BaseNormalizer {
                         'from' => [
                             [
                                 'podSelector' => [
-                                    'matchLabels' => $object->getIngressMatchLabels(),
+                                    'matchLabels' => $data->getIngressMatchLabels(),
                                 ],
                             ],
                         ],
                         'ports' => [
                             [
-                                'port' => $object->getPort(),
+                                'port' => $data->getPort(),
                                 'protocol' => 'TCP',
                             ],
                         ],
                     ],
                 ],
                 'podSelector' => [
-                    'matchLabels' => $object->getPodSelectorMatchLabels(),
+                    'matchLabels' => $data->getPodSelectorMatchLabels(),
                 ],
                 'policyTypes' => [
                     'Ingress',
                 ],
             ],
         ];
-        if ($object->getLabels()) {
-            $data['metadata']['labels'] = $object->getLabels();
+        if ($data->getLabels()) {
+            $object['metadata']['labels'] = $data->getLabels();
         }
-        return $data;
+        return $object;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        // TODO: Implement getSupportedTypes() method.
+    }
 }

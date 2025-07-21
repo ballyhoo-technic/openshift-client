@@ -12,7 +12,7 @@ abstract class BackupObjectBase extends ObjectBase {
     /**
      * Defines the annotation to store a backups friendly name on.
      */
-    const FRIENDLY_NAME_ANNOTATION = 'backups.shepherd/friendly-name';
+    const string FRIENDLY_NAME_ANNOTATION = 'backups.shepherd/friendly-name';
 
     /**
      * The phase the object is in.

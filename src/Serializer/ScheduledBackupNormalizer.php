@@ -20,7 +20,7 @@ class ScheduledBackupNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = NULL, array $context = []): ScheduledBackup {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): ScheduledBackup {
         /** @var ScheduledBackup $schedule */
         $schedule = ScheduledBackup::create();
         $schedule->setName($data['metadata']['name'])
@@ -44,24 +44,26 @@ class ScheduledBackupNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = NULL, array $context = []): array {
-        /** @var ScheduledBackup $object */
-        $data = [
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array {
+        /** @var ScheduledBackup $data */
+        return [
             'apiVersion' => 'extension.shepherd/v1',
             'kind' => 'BackupScheduled',
             'metadata' => [
-                'labels' => $object->getLabels(),
-                'name' => $object->getName(),
+                'labels' => $data->getLabels(),
+                'name' => $data->getName(),
             ],
             'spec' => [
-                'retention' => $this->normalizeRetention($object),
-                'schedule' => $this->normalizeSchedule($object),
-                'volumes' => $this->normalizeVolumes($object->getVolumes()),
-                'mysql' => $this->normalizeMysqls($object->getDatabases()),
+                'retention' => $this->normalizeRetention($data),
+                'schedule' => $this->normalizeSchedule($data),
+                'volumes' => $this->normalizeVolumes($data->getVolumes()),
+                'mysql' => $this->normalizeMysqls($data->getDatabases()),
             ],
         ];
-
-        return $data;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        // TODO: Implement getSupportedTypes() method.
+    }
 }

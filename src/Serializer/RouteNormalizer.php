@@ -17,7 +17,7 @@ class RouteNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = NULL, array $context = []): Route {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Route {
         /** @var Route $route */
         $route = Route::create();
         $route->setName($data['metadata']['name']);
@@ -27,36 +27,40 @@ class RouteNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = NULL, array $context = []): array {
-        /** @var Route $object */
-        $data = [
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array {
+        /** @var Route $data */
+        $object = [
             'apiVersion' => 'v1',
             'kind' => 'Route',
             'metadata' => [
-                'name' => $object->getName(),
+                'name' => $data->getName(),
             ],
             'spec' => [
-                'host' => $object->getHost(),
-                'path' => $object->getPath(),
+                'host' => $data->getHost(),
+                'path' => $data->getPath(),
                 'tls' => [
-                    'insecureEdgeTerminationPolicy' => $object->getInsecureEdgeTerminationPolicy(),
-                    'termination' => $object->getTermination(),
+                    'insecureEdgeTerminationPolicy' => $data->getInsecureEdgeTerminationPolicy(),
+                    'termination' => $data->getTermination(),
                 ],
                 'to' => [
-                    'kind' => $object->getToKind(),
-                    'name' => $object->getToName(),
-                    'weight' => $object->getToWeight(),
+                    'kind' => $data->getToKind(),
+                    'name' => $data->getToName(),
+                    'weight' => $data->getToWeight(),
                 ],
-                'wildcardPolicy' => $object->getWildcardPolicy(),
+                'wildcardPolicy' => $data->getWildcardPolicy(),
             ],
         ];
-        if ($object->getLabels()) {
-            $data['metadata']['labels'] = $object->getLabels();
+        if ($data->getLabels()) {
+            $object['metadata']['labels'] = $data->getLabels();
         }
-        if ($object->getAnnotations()) {
-            $data['metadata']['annotations'] = $object->getAnnotations();
+        if ($data->getAnnotations()) {
+            $object['metadata']['annotations'] = $data->getAnnotations();
         }
-        return $data;
+        return $object;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        // TODO: Implement getSupportedTypes() method.
+    }
 }
