@@ -7,12 +7,12 @@ namespace UniversityOfAdelaide\OpenShift\Objects\Backups;
  */
 class Phase {
 
-    const NEW = 'New';
-    const FAILED_VALIDATION = 'FailedValidation';
-    const IN_PROGRESS = 'InProgress';
-    const COMPLETED = 'Completed';
-    const ENABLED = 'Enabled';
-    const FAILED = 'Failed';
+    const string NEW = 'New';
+    const string FAILED_VALIDATION = 'FailedValidation';
+    const string IN_PROGRESS = 'InProgress';
+    const string COMPLETED = 'Completed';
+    const string ENABLED = 'Enabled';
+    const string FAILED = 'Failed';
 
     /**
      * Returns the friendly name for a phase.

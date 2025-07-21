@@ -18,7 +18,7 @@ class RestoreListNormalizer extends BaseNormalizer {
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = NULL, array $context = []): RestoreList {
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): RestoreList {
         $restores = RestoreList::create();
 
         foreach ($data['items'] as $restoreData) {
@@ -28,4 +28,8 @@ class RestoreListNormalizer extends BaseNormalizer {
         return $restores;
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        // TODO: Implement getSupportedTypes() method.
+    }
 }
